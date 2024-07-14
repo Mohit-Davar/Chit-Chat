@@ -22,6 +22,22 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    profile: {
+        status: {
+            type: String,
+            default: 'Hey there!'
+        },
+        profileImg: {
+            type: String,
+            default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZI3WfV6fNLFMTOZ4BZZkaPXWYsqQygwzqaA&s'
+        }
+    },
+    contacts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ]
 }, { timestamps: true });
 // Encrypting The password
 userSchema.pre('save', async function (next) {

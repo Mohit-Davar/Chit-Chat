@@ -31,14 +31,12 @@
             <%=user.name.firstName%>
                 <%= user.name.lastName %>
         </div>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZI3WfV6fNLFMTOZ4BZZkaPXWYsqQygwzqaA&s"
-            class="object-cover rounded-xl h-64" alt="" />
+        <img src="<%= user.profile.profileImg %>"
         <div class="font-semibold py-4">Joined <%= user.createdAt.toLocaleDateString('en-US', { month: 'long' ,
                 day: 'numeric' , year: 'numeric' })%>
         </div>
         <div class="font-light">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt,
-            perspiciatis!
+            <%= user.profile.status %>
         </div>
     </div>
 </div>
