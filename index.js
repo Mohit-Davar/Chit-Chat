@@ -9,7 +9,7 @@ const socket = require("socket.io")
 const { JWTMiddleware } = require("./middleware/jwt.js")
 const userRoute = require("./routes/userRoute.js")
 const chatRoute = require("./routes/chatRoute.js")
-
+const user = require("./model/userModel.js")
 
 
 
@@ -44,9 +44,10 @@ connectToMongoDB("mongodb://localhost:27017/Chatting-App")
 const io = new socket.Server(server)
 module.exports = io
 io.on("connection", (socket) => {
-  socket.on("welcome", (username) => {
+  socket.on("welcome", (email) => {
     // socket.broadcast.emit("message", `Welcome ${username}`)
-    socket.join(username)
+    socket.join(email)
+
   })
   socket.on("private", (data) => {
     io.to(data.to).emit("message", data.msg)
