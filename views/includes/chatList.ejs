@@ -7,16 +7,20 @@
     </div>
     <!-- end search compt -->
     <!-- user list -->
-    <div class="flex flex-row py-4 px-2 justify-center items-center border-b-2">
-        <div class="w-1/4">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZI3WfV6fNLFMTOZ4BZZkaPXWYsqQygwzqaA&s"
-                class="object-cover object-center h-12 w-12 rounded-full" alt="" />
+    <% if (locals.contacts) { %>
+    <% contacts.forEach(contact => { %>    
+        <div class="flex flex-row py-4 px-2 justify-center items-center border-b-2">
+            <div class="w-1/4">
+                <img src=<%=contact.profile.profileImg%>
+                    class="object-cover object-center h-12 w-12 rounded-full" alt="profile picture" />
+            </div>
+            <div class="w-full">
+                <div class="text-lg font-semibold"><%=contact.name.firstName%> <%=contact.name.lastName%></div>
+                <span class="text-gray-500">Pick me at 9:00 Am</span>
+            </div>
         </div>
-        <div class="w-full">
-            <div class="text-lg font-semibold">Luis1994</div>
-            <span class="text-gray-500">Pick me at 9:00 Am</span>
-        </div>
-    </div>
+    <% }) %>
+    <% } %>
     <div class="flex flex-row py-4 px-2 items-center border-b-2">
         <div class="w-1/4">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZI3WfV6fNLFMTOZ4BZZkaPXWYsqQygwzqaA&s"

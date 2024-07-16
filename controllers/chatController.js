@@ -58,9 +58,20 @@ const addContact = async (req, res) => {
         return res.redirect("/chat");
     }
 }
+const displayHome = async (req, res) => {
+    const email = req.userData.email
+    try {
+        const loggedInUser = await user.findOne({ email: email }).populate("contacts")
+        return res.render("home", {
+            user: loggedInUser
+        })
+    } catch (err) {
 
+    }
+}
 module.exports = {
     displayChat,
     displayContact,
-    addContact
+    addContact,
+    displayHome
 }
