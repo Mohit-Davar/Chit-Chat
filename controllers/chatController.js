@@ -1,4 +1,5 @@
 const user = require("../model/userModel.js")
+
 const displayChat = async (req, res) => {
     const email = req.params.id
     try {
@@ -17,6 +18,49 @@ const displayChat = async (req, res) => {
         return res.redirect("/chat")
     }
 }
-module.exports={
-    displayChat
+const displayContact = async (req, res) => {
+    query = req.query.name
+    if (!query) return res.redirect("/chat")
+    try {
+        allUsers = await user.find({ $text: { $search: `${query}` } })
+        if (!allUsers) {
+            req.flash("error", "No such user exist")
+            return res.redirect("/chat")
+        }
+        return res.render("contacts", {
+            users: allUsers
+        })
+    } catch (err) {
+        req.flash("error", "Internal Server Error")
+        return res.redirect("/chat")
+    }
+}
+const addContact = async (req, res) => {
+    const id = req.params.id;
+    if (id === req.userData.id) {
+        req.flash("error", "You cannot add yourself as a contact");
+        return res.redirect("/chat");
+    };
+    try {
+        await user.findOneAndUpdate(
+            {
+                email: req.userData.email
+            },
+            {
+                $addToSet: {
+                    contacts: id
+                }
+            }
+        );
+        return res.redirect("/chat");
+    } catch (err) {
+        req.flash("error", "An error occurred while adding the contact");
+        return res.redirect("/chat");
+    }
+}
+
+module.exports = {
+    displayChat,
+    displayContact,
+    addContact
 }
