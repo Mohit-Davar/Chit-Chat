@@ -9,8 +9,6 @@ const socket = require("socket.io")
 const { JWTMiddleware } = require("./middleware/jwt.js")
 const userRoute = require("./routes/userRoute.js")
 const chatRoute = require("./routes/chatRoute.js")
-const user = require("./model/userModel.js")
-
 
 
 // Acquiring Express

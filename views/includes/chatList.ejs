@@ -1,5 +1,5 @@
 <!-- chat list -->
-<div class="flex flex-col w-2/5 border-r-2 overflow-y-auto">
+<div class="flex flex-col w-2/5 border-r-2 overflow-y-auto min-h-screen">
     <!-- search compt -->
     <div class="border-b-2 py-4 px-2">
         <input type="text" placeholder="search chatting"
@@ -8,17 +8,19 @@
     <!-- end search compt -->
     <!-- user list -->
     <% if (locals.contacts) { %>
-    <% contacts.forEach(contact => { %>    
-        <div class="flex flex-row py-4 px-2 justify-center items-center border-b-2">
-            <div class="w-1/4">
-                <img src=<%=contact.profile.profileImg%>
-                    class="object-cover object-center h-12 w-12 rounded-full" alt="profile picture" />
+    <% contacts.forEach(contact => { %> 
+        <a href="/chat/messages/<%=contact.email%>">
+            <div class="flex flex-row py-4 px-2 justify-center items-center border-b-2">
+                <div class="w-1/4">
+                    <img src=<%=contact.profile.profileImg%>
+                        class="object-cover object-center h-12 w-12 rounded-full" alt="profile picture" />
+                </div>
+                <div class="w-full">
+                    <div class="text-lg font-semibold"><%=contact.name.firstName%> <%=contact.name.lastName%></div>
+                    <span class="text-gray-500">Pick me at 9:00 Am</span>
+                </div>
             </div>
-            <div class="w-full">
-                <div class="text-lg font-semibold"><%=contact.name.firstName%> <%=contact.name.lastName%></div>
-                <span class="text-gray-500">Pick me at 9:00 Am</span>
-            </div>
-        </div>
+        </a>   
     <% }) %>
     <% } %>
     <div class="flex flex-row py-4 px-2 items-center border-b-2">

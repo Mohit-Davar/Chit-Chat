@@ -1,6 +1,8 @@
 // importing user model
 const user = require("../model/userModel.js")
 const { JWTGeneration } = require("../service/userAuthentication.js")
+const fs = require('fs');
+const path = require('path');
 // function to handle User Signup
 async function handleUserSignUp(req, res) {
     const options = {
@@ -23,7 +25,8 @@ async function handleUserSignUp(req, res) {
         })
         const payload = {
             email: result.email,
-            id: result._id
+            id: result._id,
+            img: result.profile.profileImg
         }
         const token = JWTGeneration(payload)
         res.cookie("token", token, options)
@@ -34,7 +37,7 @@ async function handleUserSignUp(req, res) {
             return res.redirect(`/user/signup`)
         }
         console.log(error)
-        req.flash('error', 'Internal Server Error')
+        req.flash('error', 'Internal Server Error , cannot Signup right now')
         return res.redirect(`/user/signup`)
     }
 }
@@ -63,17 +66,60 @@ async function handleUserSignIn(req, res) {
         }
         const payload = {
             email: candidate.email,
-            id: candidate._id
+            id: candidate._id,
+            img: candidate.profile.profileImg
         }
         const token = JWTGeneration(payload)
         res.cookie("token", token, options)
         return res.redirect(`/chat`)
     } catch (err) {
-        req.flash('error', 'Internal Server Error')
+        req.flash('error', 'Internal server error, cannot login right now')
         return res.redirect(`/user/login`)
+    }
+}
+//function to handle edit
+async function handleProfileEdit(req, res) {
+    const { email } = req.userData; // Assuming req.userData contains logged-in user's email
+    const body = req.body;
+
+    try {
+        // Find the logged-in user by email
+        const loggedInUser = await user.findOne({ email });
+
+        // Prepare update fields
+        const updateFields = {
+            profile: {
+                status: loggedInUser.profile.status,
+                profileImg: loggedInUser.profile.profileImg
+            }
+        };
+
+        // Update profileImg if there's a file upload
+        if (req.file) {
+            const filePath = path.resolve(__dirname, `../public/${loggedInUser.profile.profileImg}`);
+
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    req.flash("error","Internal server error, cannot change photo now")
+                    return res.redirect("/chat/myprofile")
+                }
+            });
+            updateFields.profile.profileImg = `/uploads/${req.file.filename}`;
+        }
+        // Update status if it's provided in the request body
+        if (body.status) {
+            updateFields.profile.status = body.status;
+        }
+        // Update the user's profile
+        await user.updateOne({ email }, updateFields);
+        return res.redirect("/chat");
+    } catch (err) {
+        req.flash("error", "Internal server error, cannot edit right now.")
+        return res.redirect("/chat");
     }
 }
 module.exports = {
     handleUserSignUp,
     handleUserSignIn,
+    handleProfileEdit
 }

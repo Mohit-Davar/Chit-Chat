@@ -14,15 +14,24 @@
 
 <body>
     <div class="container mx-auto rounded-lg min-h-screen">
-        <%- include('includes/header.ejs') %>
-            <!-- Chatting -->
-            <div class="flex items-stretch justify-between bg-white">
-                <%- include('includes/chatList.ejs') %>
-                    <%- include('includes/chat.ejs' , {user:user }) %>
-            </div>
+        <% if (locals.error) { %>
+            <p class="text-red-500  text-xs italic">
+                <%= error %>
+            </p>
+            <% } %>
+                <%- include('includes/header.ejs',{profileImg:profile.profile.profileImg}) %>
+                    <!-- Chatting -->
+                    <div class="flex items-stretch justify-between bg-white">
+                        <%- include('includes/chatList.ejs',{contacts: profile.contacts}) %>
+                            <%- include('includes/chat.ejs' , {user: user }) %>
+                    </div>
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
-
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+</script>
 
 </html>
