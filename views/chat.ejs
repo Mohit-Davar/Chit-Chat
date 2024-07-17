@@ -26,12 +26,27 @@
                             <%- include('includes/chat.ejs' , {user: user }) %>
                     </div>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // document.addEventListener("DOMContentLoaded", () => {
+        //     window.scrollTo(0, document.body.scrollHeight)
+        // });
+        const socket = io()
+        const message = document.querySelector('.message');
+        const send = document.querySelector('.send');
+
+        send.addEventListener('click', (e) => {
+            e.preventDefault()
+            socket.emit("private", {
+                msg: message.value,
+                sendTo: `<%=user.email%>`,
+                sentBy: `<%=profile.email%>`
+            })
+        });
+        socket.on("private",(msg)=>{
+            
+        })
+    </script>
 </body>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        window.scrollTo(0, document.body.scrollHeight);
-    });
-</script>
 
 </html>

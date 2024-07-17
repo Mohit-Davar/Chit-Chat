@@ -38,17 +38,18 @@ app.use(cookieParser())
 //connecting MongoDB
 connectToMongoDB("mongodb://localhost:27017/Chatting-App")
 
+
+// socket.io code
 // Acquiring Socket.io package
 const io = new socket.Server(server)
-module.exports = io
 io.on("connection", (socket) => {
+  const rooms = []
   socket.on("welcome", (email) => {
-    // socket.broadcast.emit("message", `Welcome ${username}`)
-    socket.join(email)
-
   })
-  socket.on("private", (data) => {
-    io.to(data.to).emit("message", data.msg)
+  socket.on("private", ({sendTo,sentBy,msg}) => {
+    rooms.push(sendTo)
+    socket.join(rooms)
+    io.to(sendTo).emit('private', msg);
   })
 })
 //Routes
