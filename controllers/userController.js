@@ -97,14 +97,17 @@ async function handleProfileEdit(req, res) {
         // Update profileImg if there's a file upload
         if (req.file) {
             const filePath = path.resolve(__dirname, `../public/${loggedInUser.profile.profileImg}`);
-
-            fs.unlink(filePath, (err) => {
-                if (err) {
-                    req.flash("error","Internal server error, cannot change photo now")
-                    return res.redirect("/chat/myprofile")
-                }
-            });
             updateFields.profile.profileImg = `/uploads/${req.file.filename}`;
+            
+            if(!loggedInUser.profile.profileImg == "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZI3WfV6fNLFMTOZ4BZZkaPXWYsqQygwzqaA&s"){
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        req.flash("error", "Internal server error, cannot change photo now")
+                        return res.redirect("/chat/myprofile")
+                    }
+                });
+            }
+
         }
         // Update status if it's provided in the request body
         if (body.status) {

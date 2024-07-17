@@ -44,12 +44,14 @@ connectToMongoDB("mongodb://localhost:27017/Chatting-App")
 const io = new socket.Server(server)
 io.on("connection", (socket) => {
   const rooms = []
-  socket.on("welcome", (email) => {
-  })
-  socket.on("private", ({sendTo,sentBy,msg}) => {
-    rooms.push(sendTo)
+  socket.on("join", (email) => {
+    if(!rooms.includes(email)) rooms.push(email)
     socket.join(rooms)
-    io.to(sendTo).emit('private', msg);
+  })
+  socket.on("private", ({ sendTo, sentBy, msg }) => {
+    if (!rooms.includes(sendTo)) rooms.push(sendTo)
+    socket.join(rooms)
+    socket.broadcast.to(sendTo).emit('private', msg);
   })
 })
 //Routes

@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <div class="container mx-auto rounded-lg min-h-screen flex flex-col justify-stretch">
+    <div class="container mx-auto rounded-lg h-screen flex flex-col justify-stretch">
         <% if (locals.error) { %>
             <p class="text-red-500  text-xs italic">
                 <%= error %>
@@ -27,5 +27,8 @@
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
-
+<script>
+    const socket = io()
+    socket.emit("join",`<%=user.email%>`)
+</script>
 </html>

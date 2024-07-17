@@ -65,18 +65,5 @@
         </div>
     </form>
 </body>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
-
-    const form = document.querySelector('.form');
-    const input = document.getElementById('email');
-
-    form.addEventListener('submit', (e) => {
-        if (input.value) {
-            socket.emit('welcome', input.value);
-        }
-    });
-</script>
 
 </html>

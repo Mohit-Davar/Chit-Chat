@@ -34,17 +34,33 @@
         const socket = io()
         const message = document.querySelector('.message');
         const send = document.querySelector('.send');
+        const messages = document.querySelector(".chats")
 
+        socket.emit("join", `<%=profile.email%>`)
         send.addEventListener('click', (e) => {
             e.preventDefault()
+            messages.innerHTML += `
+            <div class="flex justify-end mb-4">
+                <div class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
+                    ${message.value}
+                </dv>
+            </div>
+            `
             socket.emit("private", {
                 msg: message.value,
                 sendTo: `<%=user.email%>`,
                 sentBy: `<%=profile.email%>`
             })
+            message.value=""
         });
-        socket.on("private",(msg)=>{
-            
+        socket.on("private", (msg) => {
+            messages.innerHTML += `
+            <div class="flex justify-start mb-4">
+                <div class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                    <pre class="whitespace-pre-wrap">${msg}</pre>
+                </div>
+            </div>
+            `
         })
     </script>
 </body>
