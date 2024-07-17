@@ -9,6 +9,7 @@ const socket = require("socket.io")
 const { JWTMiddleware } = require("./middleware/jwt.js")
 const userRoute = require("./routes/userRoute.js")
 const chatRoute = require("./routes/chatRoute.js")
+const { addMessage, updateChat } = require("./controllers/messageController.js")
 
 
 // Acquiring Express
@@ -44,11 +45,19 @@ connectToMongoDB("mongodb://localhost:27017/Chatting-App")
 const io = new socket.Server(server)
 io.on("connection", (socket) => {
   const rooms = []
+  
   socket.on("join", (email) => {
-    if(!rooms.includes(email)) rooms.push(email)
+    if (!rooms.includes(email)) rooms.push(email)
     socket.join(rooms)
   })
-  socket.on("private", ({ sendTo, sentBy, msg }) => {
+
+  socket.on("private", async ({ sendTo, sentBy, msg }) => {
+    // sending message to yourself
+    socket.emit("ownMessage", msg)
+    // adding message to db
+    const messageId = await addMessage(sentBy, sendTo, msg)
+    await updateChat(sentBy, sendTo, messageId)
+    //Joining Socket to recievers room
     if (!rooms.includes(sendTo)) rooms.push(sendTo)
     socket.join(rooms)
     socket.broadcast.to(sendTo).emit('private', msg);

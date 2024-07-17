@@ -1,28 +1,30 @@
 const user = require("../model/userModel.js")
+const chat = require("../model/chatModel.js")
 
 const displayChat = async (req, res) => {
     const email = req.params.id
-    if (email === req.userData.email){
-        req.flash("error","You cannot message yourself")
+    if (email === req.userData.email) {
+        req.flash("error", "You cannot message yourself")
         return res.redirect("/chat")
     }
 
-        try {
-            const searchedUser = await user.findOne({
-                email: email
-            })
-            if (!searchedUser) {
-                req.flash('error', 'No Such User Exist')
-                return res.redirect("/chat")
-            }
-            return res.render("chat", {
-                user: searchedUser,
-                profile: await user.findOne({ email: req.userData.email }).populate("contacts")
-            })
-        } catch (err) {
-            req.flash('error', 'Internal server error, cannot display chat right now')
+    try {
+        const searchedUser = await user.findOne({
+            email: email
+        })
+        if (!searchedUser) {
+            req.flash('error', 'No Such User Exist')
             return res.redirect("/chat")
         }
+        return res.render("chat", {
+            user: searchedUser,
+            profile: await user.findOne({ email: req.userData.email }).populate("contacts"),
+            chat: await chat.findOne({ participants: { $all: [req.userData.id, searchedUser._id] } }).populate("messages")
+        })
+    } catch (err) {
+        req.flash('error', 'Internal server error, cannot display chat right now')
+        return res.redirect("/chat")
+    }
 }
 const displayContact = async (req, res) => {
     query = req.query.name
