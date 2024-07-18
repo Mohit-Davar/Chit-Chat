@@ -13,22 +13,20 @@
 </head>
 
 <body>
-    <div class="container mx-auto rounded-lg h-screen flex flex-col justify-stretch">
-        <% if (locals.error) { %>
-            <p class="text-red-500  text-xs italic">
-                <%= error %>
-            </p>
-            <% } %>
+    <% if (locals.error) { %>
+        <p class="text-red-500  text-xs italic">
+            <%= error %>
+        </p>
+        <% } %>
+            <div class="container mx-auto rounded-lg h-screen flex flex-col">
                 <%- include('includes/header.ejs',{profileImg:profileImg}) %>
-                    <!-- Chatting -->
-                    <div class="flex items-stretch justify-between bg-white">
-                        <%- include('includes/chatList.ejs',{contacts:user.contacts}) %>
-                    </div>
-    </div>
+                    <%- include('includes/chatList.ejs',{contacts:user.contacts}) %>
+            </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io()
-    socket.emit("join",`<%=user.email%>`)
+    socket.emit("join", `<%=user.email%>`)
 </script>
+
 </html>

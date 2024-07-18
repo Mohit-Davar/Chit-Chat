@@ -13,58 +13,65 @@
 </head>
 
 <body>
-    <div class="container mx-auto rounded-lg min-h-screen">
-        <% if (locals.error) { %>
-            <p class="text-red-500  text-xs italic">
-                <%= error %>
-            </p>
-            <% } %>
+    <% if (locals.error) { %>
+        <p class="text-red-500  text-xs italic">
+            <%= error %>
+        </p>
+        <% } %>
+            <div class="mx-auto rounded-lg h-screen flex flex-col">
                 <%- include('includes/header.ejs',{profileImg:profile.profile.profileImg}) %>
-                    <!-- Chatting -->
-                    <div class="flex items-stretch justify-between bg-white">
+                    <div class="flex bg-white flex-grow" style="height: calc(100vh - 96px);">
                         <%- include('includes/chatList.ejs',{contacts: profile.contacts}) %>
-                            <%- include('includes/chat.ejs' , {user:user , chat:chat} ) %>
+                            <%- include('includes/chat.ejs' , {profile:profile, chat:chat} ) %>
                     </div>
-    </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        // document.addEventListener("DOMContentLoaded", () => {
-        //     window.scrollTo(0, document.body.scrollHeight)
-        // });
-        const socket = io()
-        const message = document.querySelector('.message');
-        const send = document.querySelector('.send');
-        const messages = document.querySelector(".chats")
+            </div>
+            <script src="/socket.io/socket.io.js"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.querySelector(".chat").scrollTo(0, document.body.scrollHeight)
+                });
 
-        socket.emit("join", `<%=profile._id%>`)
-        send.addEventListener('click', (e) => {
-            e.preventDefault()
-            socket.emit("private", {
-                msg: message.value,
-                sendTo: `<%=user._id%>`,
-                sentBy: `<%=profile._id%>`
-            })
-            message.value = ""
-        });
-        socket.on("private", (msg) => {
-            messages.innerHTML += `
-            <div class="flex justify-start mb-4">
-                <div class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
-                    <pre class="whitespace-pre-wrap">${msg}</pre>
-                </div>
-            </div>
-            `
-        })
-        socket.on("ownMessage", (msg) => {
-            messages.innerHTML += `
-            <div class="flex justify-end mb-4">
-                <div class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
-                    ${msg}
-                </dv>
-            </div>
-            `
-        })
-    </script>
+                const socket = io()
+                const message = document.querySelector('.message');
+                const send = document.querySelector('.send');
+                const messages = document.querySelector('.chatscontainer')
+
+                socket.emit("join", `<%=profile._id%>`)
+
+                // message.event
+
+                send.addEventListener('click', (e) => {
+                    e.preventDefault()
+                    socket.emit("private", {
+                        msg: message.value,
+                        sendTo: `<%=user._id%>`,
+                        sentBy: `<%=profile._id%>`
+                    })
+                    message.value = ""
+                });
+
+                socket.on("private", (msg) => {
+                    if (msg[1] == `<%=user._id%>`) {
+                    messages.innerHTML += `
+                            <div class="flex justify-start mb-4">
+                                <div class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                                    <pre class="whitespace-pre-wrap">${msg[0]}</pre>
+                                </div>
+                            </div>
+                            `
+                    }
+                })
+
+                socket.on("ownMessage", (msg) => {
+                    messages.innerHTML += `
+                        <div class="flex justify-end mb-4">
+                            <div class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
+                                <pre class="whitespace-pre-wrap">${msg}</pre>
+                            </div>
+                        </div>
+                        `
+                })
+            </script>
 </body>
 
 </html>

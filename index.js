@@ -45,7 +45,7 @@ connectToMongoDB("mongodb://localhost:27017/Chatting-App")
 const io = new socket.Server(server)
 io.on("connection", (socket) => {
   const rooms = []
-  
+
   socket.on("join", (email) => {
     if (!rooms.includes(email)) rooms.push(email)
     socket.join(rooms)
@@ -60,7 +60,11 @@ io.on("connection", (socket) => {
     //Joining Socket to recievers room
     if (!rooms.includes(sendTo)) rooms.push(sendTo)
     socket.join(rooms)
-    socket.broadcast.to(sendTo).emit('private', msg);
+    socket.broadcast.to(sendTo).emit('private', [msg, sentBy]);
+  })
+
+  socket.on("disconnect", () => {
+    socket.leave(rooms);
   })
 })
 //Routes

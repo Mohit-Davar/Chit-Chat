@@ -1,7 +1,7 @@
 <!-- chat list -->
-<div class="flex flex-col w-2/5 border-r-2 overflow-y-auto">
+<div class="flex flex-col w-2/5 border-r-2 overflow-y-scroll flex-grow no-scrollbar">
     <!-- search compt -->
-    <div class="border-b-2 py-4 px-2">
+    <div class="border-b-2 py-4 px-2 sticky top-0 bg-white">
         <input type="text" placeholder="search chatting"
             class="py-2 px-2 border-2 border-gray-200 rounded-2xl w-full" />
     </div>
@@ -17,22 +17,11 @@
                 </div>
                 <div class="w-full">
                     <div class="text-lg font-semibold"><%=contact.name.firstName%> <%=contact.name.lastName%></div>
-                    <span class="text-gray-500">Pick me at 9:00 Am</span>
                 </div>
             </div>
         </a>   
     <% }) %>
     <% } %>
-    <div class="flex flex-row py-4 px-2 items-center border-b-2">
-        <div class="w-1/4">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZI3WfV6fNLFMTOZ4BZZkaPXWYsqQygwzqaA&s"
-                class="object-cover h-12 w-12 rounded-full" alt="" />
-        </div>
-        <div class="w-full">
-            <div class="text-lg font-semibold">MERN Stack</div>
-            <span class="text-gray-500">Lusi : Thanks Everyone</span>
-        </div>
-    </div>
     <!-- end user list -->
 </div>
 <!-- end chat list -->

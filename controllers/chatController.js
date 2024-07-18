@@ -28,9 +28,14 @@ const displayChat = async (req, res) => {
 }
 const displayContact = async (req, res) => {
     query = req.query.name
+    const excludedUserId = req.userData.id;
     if (!query) return res.redirect("/chat")
     try {
-        allUsers = await user.find({ $text: { $search: `${query}` } })
+        const allUsers = await user.find({
+            $text: { $search: query },
+            _id: { $ne: excludedUserId }
+        });
+
         if (!allUsers) {
             req.flash("error", "No such user exist")
             return res.redirect("/chat")
@@ -45,21 +50,26 @@ const displayContact = async (req, res) => {
 }
 const addContact = async (req, res) => {
     const id = req.params.id;
-    if (id === req.userData.id) {
-        req.flash("error", "You cannot add yourself as a contact");
-        return res.redirect("/chat");
-    };
+    const userEmail = req.userData.email;
+    const userId = req.userData.id;
+
     try {
-        await user.findOneAndUpdate(
-            {
-                email: req.userData.email
+        // Perform bulk write operation to update both users simultaneously
+
+        await user.bulkWrite(
+            [{
+                updateOne: {
+                    filter: { email: userEmail },
+                    update: { $addToSet: { contacts: id } }
+                }
             },
             {
-                $addToSet: {
-                    contacts: id
+                updateOne: {
+                    filter: { _id: id },
+                    update: { $addToSet: { contacts: userId } }
                 }
             }
-        );
+        ]);
         return res.redirect("/chat");
     } catch (err) {
         req.flash("error", "An error occurred while adding the contact");

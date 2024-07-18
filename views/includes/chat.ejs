@@ -1,45 +1,43 @@
 <!-- message -->
-<div class="w-full px-5 flex flex-col justify-between">
-    <div class="flex flex-col mt-5 chats">
+<div class="w-full px-5 flex flex-col justify-between overflow-y-scroll chat no-scrollbar">
+    <div class="flex flex-col mt-5 chatscontainer">
         <% if (locals.chat) { %>
             <% chat.messages.forEach(message=> { %>
-                <% if (message.reciever==user._id) { %>
-                    <div class="flex justify-start mb-4">
-                        <div class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                <% if (message.sender.equals(profile._id)) { %>
+                    <div class="flex justify-end mb-4">
+                        <div class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
                             <pre class="whitespace-pre-wrap"><%=message.content%></pre>
                         </div>
                     </div>
-                    <% } else { %>
-                        <div class="flex justify-end mb-4">
+                <% } else {%>
+                        <div class="flex justify-start mb-4">
                             <div
-                                class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
-                                <%=message.contact%>
-                                    </dv>
+                                class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                                <pre class="whitespace-pre-wrap"><%=message.content%></pre>
                             </div>
+                        </div>
+                        <%}%>
+                            <% }) %>
+                                <% } %>
 
-                            <% } %>
-                                <% }) %>
-                                    <% } %>
-                        </div>
-                        <div class="py-5 flex gap-5 w-full">
-                            <input class="message flex-grow bg-gray-300 py-5 px-3 rounded-xl" type="text"
-                                placeholder="type your message here..." />
-                            <button class="send px-4 py-2 rounded-3xl bg-black text-white">Send Message</button>
-                        </div>
     </div>
-    <!-- end message -->
-
-    <div class="w-2/5 border-l-2 px-5">
-        <div class="flex flex-col">
-            <div class="font-semibold text-xl py-4">
-                <%=user.name.firstName%>
-                    <%= user.name.lastName %>
-            </div>
-            <img src="<%= user.profile.profileImg %>" <div class="font-semibold py-4">Joined <%=
-                user.createdAt.toLocaleDateString('en-US', { month: 'long' , day: 'numeric' , year: 'numeric' })%>
+    <div class="py-5 flex gap-5 w-full">
+        <textarea class="message flex-grow bg-gray-300 py-5 px-3 rounded-xl" type="text"
+            placeholder="type your message here..." ></textarea>
+        <button class="send px-4 py-2 rounded-3xl bg-black text-white">Send Message</button>
+    </div>
+</div>
+<!-- end message -->
+<div class="w-2/5 border-l-2 px-5">
+    <div class="flex flex-col">
+        <div class="font-semibold text-xl py-4">
+            <%=user.name.firstName%>
+                <%= user.name.lastName %>
         </div>
-        <div class="font-light">
-            <%= user.profile.status %>
-        </div>
+        <img src="<%= user.profile.profileImg %>" <div class="font-semibold py-4">Joined <%=
+            user.createdAt.toLocaleDateString('en-US', { month: 'long' , day: 'numeric' , year: 'numeric' })%>
+    </div>
+    <div class="font-light">
+        <%= user.profile.status %>
     </div>
 </div>
