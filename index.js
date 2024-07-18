@@ -51,25 +51,27 @@ io.on("connection", (socket) => {
     socket.join(rooms)
   })
 
-  socket.on("texting", ({ sendTo, msg }) => {
+  socket.on("texting", ({ sendTo}) => {
     //Joining Socket to recievers room
     if (!rooms.includes(sendTo)) rooms.push(sendTo)
     socket.join(rooms)
     socket.broadcast.to(sendTo).emit("texting")
   })
   // Handle stop typing event
-  socket.on('stop typing', ({ sendTo, msg }) => {
+  socket.on('stop typing', ({ sendTo }) => {
     socket.broadcast.to(sendTo).emit('stop typing');
   });
 
-  socket.on("private", async ({ sendTo, sentBy, msg }) => {
+  socket.on("privateMessage", async ({ sendTo, sentBy, content }) => {
     // sending message to yourself
-    socket.emit("ownMessage", msg)
+    socket.emit("ownMessage", content)
     // adding message to db
-    const messageId = await addMessage(sentBy, sendTo, msg)
+    const messageId = await addMessage(sentBy, sendTo, content)
     await updateChat(sentBy, sendTo, messageId)
-    socket.broadcast.to(sendTo).emit('private', [msg, sentBy]);
+    socket.broadcast.to(sendTo).emit('privateMessage', [content, sentBy]);
   })
+
+  socket.on("privateImage",()=>{})
 
   socket.on("disconnect", () => {
     socket.leave(rooms);

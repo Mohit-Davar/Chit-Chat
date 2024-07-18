@@ -69,9 +69,9 @@
     // sending Message
     send.addEventListener('click', (e) => {
         e.preventDefault()
-        if(!message.value) return
-        socket.emit("private", {
-            msg: message.value,
+        if(!message.value ) return
+        socket.emit("privateMessage", {
+            content: message.value,
             sendTo: `<%=user._id%>`,
             sentBy: `<%=profile._id%>`
         })
@@ -86,12 +86,12 @@
         typingIndicator.innerText = '';
     });
     //On recieveing Private Message from other user
-    socket.on("private", (msg) => {
-        if (msg[1] == `<%=user._id%>`) {
+    socket.on("privateMessage", (data) => {
+        if (data[1] == `<%=user._id%>`) {
             messages.innerHTML += `
                             <div class="flex justify-start mb-4">
                                 <div class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
-                                    <pre class="whitespace-pre-wrap">${msg[0]}</pre>
+                                    <pre class="whitespace-pre-wrap">${data[0]}</pre>
                                 </div>
                             </div>
                             `
@@ -107,6 +107,9 @@
                         </div>
                         `
     })
+</script>
+<script>
+    
 </script>
 <!-- Emoji Picker Logic -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
