@@ -51,15 +51,23 @@ io.on("connection", (socket) => {
     socket.join(rooms)
   })
 
+  socket.on("texting", ({ sendTo, msg }) => {
+    //Joining Socket to recievers room
+    if (!rooms.includes(sendTo)) rooms.push(sendTo)
+    socket.join(rooms)
+    socket.broadcast.to(sendTo).emit("texting")
+  })
+  // Handle stop typing event
+  socket.on('stop typing', ({ sendTo, msg }) => {
+    socket.broadcast.to(sendTo).emit('stop typing');
+  });
+
   socket.on("private", async ({ sendTo, sentBy, msg }) => {
     // sending message to yourself
     socket.emit("ownMessage", msg)
     // adding message to db
     const messageId = await addMessage(sentBy, sendTo, msg)
     await updateChat(sentBy, sendTo, messageId)
-    //Joining Socket to recievers room
-    if (!rooms.includes(sendTo)) rooms.push(sendTo)
-    socket.join(rooms)
     socket.broadcast.to(sendTo).emit('private', [msg, sentBy]);
   })
 

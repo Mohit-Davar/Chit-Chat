@@ -1,30 +1,39 @@
 <!-- message -->
-<div class="w-full px-5 flex flex-col justify-between overflow-y-scroll chat no-scrollbar">
-    <div class="flex flex-col mt-5 chatscontainer">
-        <% if (locals.chat) { %>
-            <% chat.messages.forEach(message=> { %>
-                <% if (message.sender.equals(profile._id)) { %>
-                    <div class="flex justify-end mb-4">
-                        <div class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
-                            <pre class="whitespace-pre-wrap"><%=message.content%></pre>
-                        </div>
-                    </div>
-                <% } else {%>
-                        <div class="flex justify-start mb-4">
+<div class="w-full flex flex-col justify-between overflow-y-scroll chat no-scrollbar">
+    <div>
+        <div class="px-5 flex flex-col mt-5 chatscontainer">
+            <% if (locals.chat) { %>
+                <% chat.messages.forEach(message=> { %>
+                    <% if (message.sender.equals(profile._id)) { %>
+                        <div class="flex justify-end mb-4">
                             <div
-                                class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                                class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
                                 <pre class="whitespace-pre-wrap"><%=message.content%></pre>
                             </div>
                         </div>
-                        <%}%>
-                            <% }) %>
-                                <% } %>
+                        <% } else {%>
+                            <div class="flex justify-start mb-4">
+                                <div
+                                    class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                                    <pre class="whitespace-pre-wrap"><%=message.content%></pre>
+                                </div>
+                            </div>
+                            <%}%>
+                                <% }) %>
+                                    <% } %>
 
+        </div>
+        <div id="typingIndicator" class="text-red-600 font-bold text-2xl animate-pulse "></div>
     </div>
-    <div class="py-5 flex gap-5 w-full">
-        <textarea class="message flex-grow bg-gray-300 py-5 px-3 rounded-xl" type="text"
-            placeholder="type your message here..." ></textarea>
-        <button class="send px-4 py-2 rounded-3xl bg-black text-white">Send Message</button>
+    <!-- message input -->
+    <div class="py-5 px-5 flex gap-5 items-center bg-blue-400">
+        <button class="emojiButton text-white text-2xl hover:bg-blue-500 px-4 py-2 rounded-xl transition-all"><i class="fa-regular fa-face-smile"></i></button>
+        <div class="tooltip" role="tooltip">
+            <emoji-picker></emoji-picker>
+        </div>
+        <textarea class="message flex-grow  py-5 px-3 focus:bg-blue-300 focus:outline-none rounded-xl flex-shrink bg-blue-400 placeholder:text-white text-white transition-all no-scrollbar" type="text"
+            placeholder="type your message here..." rows="2"></textarea>
+        <button class="send text-2xl h-fit text-white hover:bg-blue-500 px-4 py-2 rounded-xl transition-all"><i class="fa-regular fa-paper-plane"></i></button>
     </div>
 </div>
 <!-- end message -->
