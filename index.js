@@ -3,6 +3,9 @@ const http = require("http")
 const path = require("path")
 const { connectToMongoDB } = require("./connection.js")
 
+require('dotenv').config()
+const PORT = process.env.PORT 
+
 const session = require("express-session")
 const flash = require("connect-flash")
 
@@ -27,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 //Package for sending error
 // Set up session middleware
 app.use(session({
-  secret: 'your_secret_key',
+  secret: process.env.ErrorKey,
   resave: false,
   saveUninitialized: true
 }));
@@ -42,7 +45,7 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser())
 //connecting MongoDB
-connectToMongoDB("mongodb://localhost:27017/Chatting-App")
+connectToMongoDB(process.env.MongoDBURL)
 
 
 // socket.io code
@@ -106,4 +109,4 @@ app.use("/user", userRoute)
 app.set("view engine", "ejs")
 app.set("views", path.resolve("./views"))
 
-server.listen(8000, () => console.log('Server Started'))
+server.listen(PORT, () => console.log(`Server Started at ${PORT}`))
