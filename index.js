@@ -1,15 +1,20 @@
 const express = require("express")
 const http = require("http")
 const path = require("path")
+const { connectToMongoDB } = require("./connection.js")
+
 const session = require("express-session")
 const flash = require("connect-flash")
-const cookieParser = require('cookie-parser')
-const { connectToMongoDB } = require("./connection.js")
-const socket = require("socket.io")
+
 const { JWTMiddleware } = require("./middleware/jwt.js")
+const cookieParser = require('cookie-parser')
+
 const userRoute = require("./routes/userRoute.js")
 const chatRoute = require("./routes/chatRoute.js")
+
+const socket = require("socket.io")
 const { addMessage, updateChat } = require("./controllers/messageController.js")
+const fs = require('fs')
 
 
 // Acquiring Express
@@ -71,8 +76,22 @@ io.on("connection", (socket) => {
     socket.broadcast.to(sendTo).emit('privateMessage', [content, sentBy]);
   })
 
-  socket.on("privateImage", ({ data, sendTo, sentBy }) => {
+  socket.on("privateImage", async ({ data, sendTo, sentBy, fileName }) => {
+    if (!rooms.includes(sendTo)) rooms.push(sendTo)
+    socket.join(rooms)
     socket.emit("ownImage", data)
+    const filePath = path.join(__dirname, 'public/uploads', fileName);
+
+    fs.writeFile(filePath, Buffer.from(data), async (err) => {
+      if (err) {
+        socket.emit('uploadError', { error: 'Failed to upload image' });
+      } else {
+        const imageUrl = `/uploads/${fileName}`;
+        // adding message to db
+        const messageId = await addMessage(sentBy, sendTo, imageUrl, "image")
+        await updateChat(sentBy, sendTo, messageId)
+      }
+    });
     socket.broadcast.to(sendTo).emit('privateImage', [data, sentBy]);
   })
 

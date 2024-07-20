@@ -4,23 +4,35 @@
         <div class="px-5 flex flex-col mt-5 chatscontainer">
             <% if (locals.chat) { %>
                 <% chat.messages.forEach(message=> { %>
-                    <% if (message.sender.equals(profile._id)) { %>
-                        <div class="flex justify-end mb-4">
-                            <div
-                                class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
-                                <pre class="whitespace-pre-wrap"><%=message.content%></pre>
-                            </div>
-                        </div>
-                        <% } else {%>
-                            <div class="flex justify-start mb-4">
+                    <% if (message.type=="text" ) { %>
+                        <% if (message.sender.equals(profile._id)) { %>
+                            <div class="flex justify-end mb-4">
                                 <div
-                                    class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                                    class="mr-2 py-3 px-4 bg-blue-400 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-white">
                                     <pre class="whitespace-pre-wrap"><%=message.content%></pre>
                                 </div>
                             </div>
-                            <%}%>
-                                <% }) %>
-                                    <% } %>
+                            <% } else {%>
+                                <div class="flex justify-start mb-4">
+                                    <div
+                                        class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
+                                        <pre class="whitespace-pre-wrap"><%=message.content%></pre>
+                                    </div>
+                                </div>
+                                <%}%>
+                                    <% } else if(message.type=="image" ) {%>
+                                        <% if (message.sender.equals(profile._id)) { %>
+                                            <div class="flex self-end mb-4 w-48 h-52 object-contain object-center">
+                                                <img src=<%=message.content%> alt="photo">
+                                            </div>
+                                            <% } else {%>
+                                                <div class="flex mb-4 self-start w-48 h-52 object-contain object-center">
+                                                    <img src=<%=message.content%> alt="photo">
+                                                </div>
+                                                <%}%>
+                                                    <% } %>
+                                                        <% }) %>
+                                                            <% } %>
 
         </div>
         <div id="typingIndicator" class="text-red-600 font-bold text-2xl animate-pulse ml-5"></div>
@@ -37,10 +49,10 @@
             <summary class="text-white text-2xl hover:bg-blue-500 px-4 py-2 rounded-xl transition-all"><i
                     class="fa-regular fa-image"></i>
             </summary>
-            <div class="mb-5 absolute top-0  left-0 bg-white">
+            <div class="mb-5 fixed top-0  left-0 bg-white">
                 <div class="w-full relative border-2 border-gray-300 border-dashed rounded-lg p-4" id="dropzone">
                     <input type="file" name="file-upload" id="file-upload"
-                        class="absolute inset-0 w-full h-full opacity-0  z-50" />
+                        class="absolute inset-0 w-full h-full opacity-0  z-50" accept="image/*" />
                     <div class="text-center">
                         <img class="mx-auto h-12 w-12" src="https://www.svgrepo.com/show/357902/image-upload.svg"
                             alt="">
@@ -50,7 +62,7 @@
                                 <span>Drag and drop</span>
                                 <span class="text-indigo-600"> or browse</span>
                                 <span>to upload profile photo</span>
-                                <input id="coverImage" name="coverImage" type="file" class="sr-only">
+                                <input id="coverImage" name="coverImage" type="file" class="sr-only" accept="image/*">
                             </label>
                         </h3>
                         <p class="mt-1 text-xs text-gray-500">
@@ -60,7 +72,8 @@
 
                     <img src="" class="mt-4 mx-auto max-h-40 hidden" id="preview">
                 </div>
-                <button class="w-full px-4 py-2 text-center bg-blue-400 text-white shareImage"><i class="fa-solid fa-share-nodes"></i>
+                <button class="w-full px-4 py-2 text-center bg-blue-400 text-white shareImage"><i
+                        class="fa-solid fa-share-nodes"></i>
                 </button>
             </div>
         </details>

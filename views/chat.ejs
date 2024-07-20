@@ -54,12 +54,16 @@
     const send = document.querySelector('.send');
     const messages = document.querySelector('.chatscontainer')
     const typingIndicator = document.getElementById('typingIndicator');
+    const tooltip = document.querySelector('.tooltip')
+
     let typingTimeout;
 
     const sender = `<%=profile._id%>`
     const reciever = `<%=user._id%>`
 </script>
-
+<!-- Emoji Picker Logic -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+<script type="module" src="/js/emoji.js"></script>
 <!-- Socket.io -->
 <!-- initial Emit and Typing event -->
 <script>
@@ -101,6 +105,10 @@
             sentBy: sender
         })
         message.value = ""
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelector(".chat").scrollTo(0, document.body.scrollHeight)
+        });
+        tooltip.classList.remove('shown')
     });
     //On recieveing Private Message from other user
     socket.on("privateMessage", ([content, sentBy]) => {
@@ -136,10 +144,12 @@
 
         reader.onload = function (e) {
             const arrayBuffer = e.target.result;
+            const fileName = `${Date.now()}-${file.name}`;
             socket.emit('privateImage', {
                 data: arrayBuffer,
                 sendTo: reciever,
-                sentBy: sender
+                sentBy: sender,
+                fileName: fileName
             }
             );
         };
@@ -150,6 +160,10 @@
         input.value = ""
         let preview = document.getElementById('preview');
         preview.classList.add("hidden")
+        tooltip.classList.remove('shown')
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelector(".chat").scrollTo(0, document.body.scrollHeight)
+        });
     })
 
     socket.on('privateImage', function ([data, sentBy]) {
@@ -157,7 +171,7 @@
             const blob = new Blob([data]);
             const url = URL.createObjectURL(blob);
             messages.innerHTML += `
-                <div class="mb-4 justify-start">
+                <div class="flex self-start mb-4 w-48 h-52 object-contain object-center">
                     <img src=${url} alt="photo">
                 </div>
             `
@@ -168,14 +182,11 @@
         const blob = new Blob([data]);
         const url = URL.createObjectURL(blob);
         messages.innerHTML += `
-                <div class="mb-4 justify-end">
+                <div class="flex self-end mb-4 w-48 h-52 object-contain object-center">
                     <img src=${url} alt="photo">
                 </div>
             `
     });
 </script>
-<!-- Emoji Picker Logic -->
-<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-<script type="module" src="/js/emoji.js"></script>
 
 </html>

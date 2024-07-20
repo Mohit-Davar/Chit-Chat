@@ -22,7 +22,7 @@ const displayChat = async (req, res) => {
             user: searchedUser,
             profile: profile,
             chat: await chat.findOne({ participants: { $all: [req.userData.id, searchedUser._id] } }).populate("messages"),
-            contacts: await sortContacts(profile._id)
+            contacts: await sortContacts(profile._id, req, res)
         })
     } catch (err) {
         req.flash('error', 'Internal server error, cannot display chat right now')
@@ -84,8 +84,7 @@ const displayHome = async (req, res) => {
     try {
         const loggedInUser = await user.findOne({ email: email })
         const userId = loggedInUser._id;
-        const contacts = await sortContacts(userId);
-
+        const contacts = await sortContacts(userId, req, res);
         return res.render("home", {
             user: loggedInUser,
             contacts: contacts

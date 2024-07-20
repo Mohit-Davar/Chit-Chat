@@ -1,12 +1,13 @@
 const message = require("../model/messageModel.js");
 const chat = require("../model/chatModel.js");
 
-const addMessage = async (sentBy, sendTo, msg) => {
+const addMessage = async (sentBy, sendTo, msg, type = "text") => {
     try {
         const genMessage = await message.create({
             sender: sentBy,
             receiver: sendTo,
-            content: msg
+            content: msg,
+            type: type
         });
         return genMessage._id;
     } catch (error) {
@@ -20,7 +21,7 @@ const updateChat = async (sentBy, sendTo, id) => {
         let gotConversation = await chat.findOneAndUpdate(
             { participants: { $all: [sentBy, sendTo] } },
             { $push: { messages: id } },
-            
+
         );
 
         if (!gotConversation) {

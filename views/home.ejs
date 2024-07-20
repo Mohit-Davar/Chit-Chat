@@ -18,11 +18,10 @@
             <%= error %>
         </p>
         <% } %>
-            <div class="container mx-auto rounded-lg h-screen flex flex-col">
+            <div class="rounded-lg h-screen flex flex-col">
                 <%- include('includes/header.ejs',{profileImg:user.profile.profileImg}) %>
                     <%- include('includes/chatList.ejs',{contacts:contacts}) %>
             </div>
 </body>
-<script src="/socket.io/socket.io.js"></script>
 
 </html>
