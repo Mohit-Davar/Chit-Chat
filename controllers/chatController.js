@@ -1,5 +1,6 @@
 const user = require("../model/userModel.js")
 const chat = require("../model/chatModel.js")
+const { sortContacts } = require("../service/sortContacts.js")
 
 const displayChat = async (req, res) => {
     const email = req.params.id
@@ -16,10 +17,12 @@ const displayChat = async (req, res) => {
             req.flash('error', 'No Such User Exist')
             return res.redirect("/chat")
         }
+        const profile = await user.findOne({ email: req.userData.email })
         return res.render("chat", {
             user: searchedUser,
-            profile: await user.findOne({ email: req.userData.email }).populate("contacts"),
-            chat: await chat.findOne({ participants: { $all: [req.userData.id, searchedUser._id] } }).populate("messages")
+            profile: profile,
+            chat: await chat.findOne({ participants: { $all: [req.userData.id, searchedUser._id] } }).populate("messages"),
+            contacts: await sortContacts(profile._id)
         })
     } catch (err) {
         req.flash('error', 'Internal server error, cannot display chat right now')
@@ -69,7 +72,7 @@ const addContact = async (req, res) => {
                     update: { $addToSet: { contacts: userId } }
                 }
             }
-        ]);
+            ]);
         return res.redirect("/chat");
     } catch (err) {
         req.flash("error", "An error occurred while adding the contact");
@@ -79,10 +82,13 @@ const addContact = async (req, res) => {
 const displayHome = async (req, res) => {
     const email = req.userData.email
     try {
-        const loggedInUser = await user.findOne({ email: email }).populate("contacts")
+        const loggedInUser = await user.findOne({ email: email })
+        const userId = loggedInUser._id;
+        const contacts = await sortContacts(userId);
+
         return res.render("home", {
             user: loggedInUser,
-            profileImg: loggedInUser.profile.profileImg
+            contacts: contacts
         })
     } catch (err) {
         req.flash("error", "Cannot connect to server right now")

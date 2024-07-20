@@ -8,20 +8,27 @@
     <!-- end search compt -->
     <!-- user list -->
     <% if (locals.contacts) { %>
-    <% contacts.forEach(contact => { %> 
-        <a href="/chat/messages/<%=contact.email%>">
-            <div class="flex flex-row py-4 px-2 justify-center items-center border-b-2">
-                <div class="w-1/4">
-                    <img src=<%=contact.profile.profileImg%>
+        <% contacts.forEach(contact=> { %>
+            <a href="/chat/messages/<%=contact.contactDetails.email%>">
+                <div class="flex flex-row py-4 px-2 justify-center items-center border-b-2">
+                    <div class="w-1/4">
+                        <img src=<%=contact.contactDetails.profile.profileImg%>
                         class="object-cover object-center h-12 w-12 rounded-full" alt="profile picture" />
+                    </div>
+                    <div class="w-full">
+                        <div class="text-lg font-semibold">
+                            <%=contact.contactDetails.name.firstName%>
+                                <%=contact.contactDetails.name.lastName%>
+                        </div>
+                        <div class="text-gray-500 flex justify-between">
+                            <span><%=contact.mostRecentMessage.content%></span>
+                            <span><%=contact.mostRecentMessage.createdAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})%></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="w-full">
-                    <div class="text-lg font-semibold"><%=contact.name.firstName%> <%=contact.name.lastName%></div>
-                </div>
-            </div>
-        </a>   
-    <% }) %>
-    <% } %>
-    <!-- end user list -->
+            </a>
+            <% }) %>
+                <% } %>
+                    <!-- end user list -->
 </div>
 <!-- end chat list -->

@@ -14,12 +14,16 @@
         .tooltip:not(.shown) {
             display: none;
         }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
 
+        details>summary {
+            list-style: none;
+        }
+
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+</head>
 
 <body>
     <% if (locals.error) { %>
@@ -30,19 +34,21 @@
             <div class="mx-auto rounded-lg h-screen flex flex-col">
                 <%- include('includes/header.ejs',{profileImg:profile.profile.profileImg}) %>
                     <div class="flex bg-white flex-grow" style="height: calc(100vh - 96px);">
-                        <%- include('includes/chatList.ejs',{contacts: profile.contacts}) %>
+                        <%- include('includes/chatList.ejs',{contacts:contacts}) %>
                             <%- include('includes/chat.ejs' , {profile:profile, chat:chat} ) %>
                     </div>
             </div>
 </body>
-<!-- Socket.io Logic -->
+
 <script src="/socket.io/socket.io.js"></script>
+
+<!-- Performing Pre-Requiesets -->
 <script>
     //scrolling to bottom
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelector(".chat").scrollTo(0, document.body.scrollHeight)
     });
-    //Acquiring Socket Io and other DOM elements
+    //Acquiring Socket Io and other DOM elements                
     const socket = io()
     const message = document.querySelector('.message');
     const send = document.querySelector('.send');
@@ -50,33 +56,29 @@
     const typingIndicator = document.getElementById('typingIndicator');
     let typingTimeout;
 
+    const sender = `<%=profile._id%>`
+    const reciever = `<%=user._id%>`
+</script>
+
+<!-- Socket.io -->
+<!-- initial Emit and Typing event -->
+<script>
     //Initial Join
-    socket.emit("join", `<%=profile._id%>`)
+    socket.emit("join", sender)
     //Sending Texting and stop event
     message.addEventListener('input', () => {
         socket.emit("texting", {
-            sendTo: `<%=user._id%>`,
+            sendTo: reciever,
             msg: message.value
         })
         clearTimeout(typingTimeout);
         typingTimeout = setTimeout(() => {
             socket.emit('stop typing', {
-                sendTo: `<%=user._id%>`,
+                sendTo: reciever,
                 msg: message.value
             });
         }, 1000); // Emit stop typing event after 1 second of inactivity
     })
-    // sending Message
-    send.addEventListener('click', (e) => {
-        e.preventDefault()
-        if(!message.value ) return
-        socket.emit("privateMessage", {
-            content: message.value,
-            sendTo: `<%=user._id%>`,
-            sentBy: `<%=profile._id%>`
-        })
-        message.value = ""
-    });
     // When recieved texting event
     socket.on("texting", () => {
         typingIndicator.innerText = `Typing...`;
@@ -85,13 +87,28 @@
     socket.on('stop typing', (data) => {
         typingIndicator.innerText = '';
     });
+</script>
+
+<!-- Sharing and recieving message -->
+<script>
+    // sending Message
+    send.addEventListener('click', (e) => {
+        e.preventDefault()
+        if (!message.value) return
+        socket.emit("privateMessage", {
+            content: message.value,
+            sendTo: reciever,
+            sentBy: sender
+        })
+        message.value = ""
+    });
     //On recieveing Private Message from other user
-    socket.on("privateMessage", (data) => {
-        if (data[1] == `<%=user._id%>`) {
+    socket.on("privateMessage", ([content, sentBy]) => {
+        if (sentBy == reciever) {
             messages.innerHTML += `
                             <div class="flex justify-start mb-4">
                                 <div class="ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white">
-                                    <pre class="whitespace-pre-wrap">${data[0]}</pre>
+                                    <pre class="whitespace-pre-wrap">${content}</pre>
                                 </div>
                             </div>
                             `
@@ -108,28 +125,57 @@
                         `
     })
 </script>
+
+<!-- Sharing and recieving Image -->
 <script>
-    
+    document.querySelector(".shareImage").addEventListener("click", (e) => {
+        let input = document.getElementById('file-upload');
+        let file = input.files[0];
+        if (!file) return
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const arrayBuffer = e.target.result;
+            socket.emit('privateImage', {
+                data: arrayBuffer,
+                sendTo: reciever,
+                sentBy: sender
+            }
+            );
+        };
+
+        reader.readAsArrayBuffer(file);
+
+        document.getElementById("imageDetails").open = false
+        input.value = ""
+        let preview = document.getElementById('preview');
+        preview.classList.add("hidden")
+    })
+
+    socket.on('privateImage', function ([data, sentBy]) {
+        if (sentBy == reciever) {
+            const blob = new Blob([data]);
+            const url = URL.createObjectURL(blob);
+            messages.innerHTML += `
+                <div class="mb-4 justify-start">
+                    <img src=${url} alt="photo">
+                </div>
+            `
+        }
+    });
+
+    socket.on('ownImage', function (data) {
+        const blob = new Blob([data]);
+        const url = URL.createObjectURL(blob);
+        messages.innerHTML += `
+                <div class="mb-4 justify-end">
+                    <img src=${url} alt="photo">
+                </div>
+            `
+    });
 </script>
 <!-- Emoji Picker Logic -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-<script type="module">
-    import * as Popper from 'https://cdn.jsdelivr.net/npm/@popperjs/core@^2/dist/esm/index.js'
-    import insertText from 'https://cdn.jsdelivr.net/npm/insert-text-at-cursor@0.3.0/index.js'
-
-    //Popup Menu
-    const emojiButton = document.querySelector('.emojiButton')
-    const tooltip = document.querySelector('.tooltip')
-    Popper.createPopper(emojiButton, tooltip)
-    emojiButton.addEventListener("click", () => {
-        tooltip.classList.toggle('shown')
-    })
-    //Adding Emoji
-    const inputBox = document.querySelector('.message');
-    document.querySelector('emoji-picker').addEventListener('emoji-click', e => {
-        insertText(inputBox, e.detail.unicode)
-    })
-
-</script>
+<script type="module" src="/js/emoji.js"></script>
 
 </html>

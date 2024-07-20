@@ -51,7 +51,7 @@ io.on("connection", (socket) => {
     socket.join(rooms)
   })
 
-  socket.on("texting", ({ sendTo}) => {
+  socket.on("texting", ({ sendTo }) => {
     //Joining Socket to recievers room
     if (!rooms.includes(sendTo)) rooms.push(sendTo)
     socket.join(rooms)
@@ -71,7 +71,10 @@ io.on("connection", (socket) => {
     socket.broadcast.to(sendTo).emit('privateMessage', [content, sentBy]);
   })
 
-  socket.on("privateImage",()=>{})
+  socket.on("privateImage", ({ data, sendTo, sentBy }) => {
+    socket.emit("ownImage", data)
+    socket.broadcast.to(sendTo).emit('privateImage', [data, sentBy]);
+  })
 
   socket.on("disconnect", () => {
     socket.leave(rooms);
