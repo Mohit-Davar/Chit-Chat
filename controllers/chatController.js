@@ -58,7 +58,6 @@ const addContact = async (req, res) => {
 
     try {
         // Perform bulk write operation to update both users simultaneously
-
         await user.bulkWrite(
             [{
                 updateOne: {
